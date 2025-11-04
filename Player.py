@@ -4,20 +4,20 @@ from settings import *
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, groups, floor):
+    def __init__(self, groups, platforms):
         super().__init__(groups)
 
         self.image = pygame.Surface((PLAYER_SIZE))
         self.image.fill('white')
-        self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-FLOOR_SIZE[1]))
+        self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
  
         self.speedx = 500
         self.speedy = 450
-        self.direction = pygame.Vector2(0,1)
+        self.direction = pygame.Vector2(0,0)
         self.is_jumping = False
         self.on_ground = True
         self.gravity = GRAVITY
-        self.floor = floor
+        self.platforms = platforms
 
     def jump(self):
         if self.on_ground and not self.is_jumping:
@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.centerx += self.direction.x * self.speedx * dt
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_SPACE]:
             self.jump()
 
 
@@ -53,7 +53,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
 
 
-        platform_collisions = pygame.sprite.spritecollide(self, self.floor, False)
+        platform_collisions = pygame.sprite.spritecollide(self, self.platforms, False)
         if platform_collisions:
             for platform in platform_collisions:
 

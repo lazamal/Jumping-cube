@@ -1,7 +1,7 @@
 import pygame
 from settings import *
 from Player import Player
-from Floor import Floor
+from Platform import Platform
 
 
 
@@ -21,7 +21,9 @@ class Game():
         self.platforms = pygame.sprite.Group()
 
         # sprites
-        self.floor = Floor((self.all_sprites, self.platforms))
+        # for i in range(1-3):
+        #     Platform((self.all_sprites, self.platforms),((WINDOW_WIDTH/2,WINDOW_HEIGHT)))
+        self.floor = Platform((self.all_sprites, self.platforms),(WINDOW_WIDTH/2,WINDOW_HEIGHT))
         self.player = Player(self.all_sprites, self.platforms)
 
 
