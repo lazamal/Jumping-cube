@@ -40,9 +40,9 @@ class Game():
                     self.running = False
 
             self.screen.fill("black")
-
-            self.all_sprites.draw(self.screen)
             self.all_sprites.update(dt)
+            self.all_sprites.draw(self.screen)
+
 
             pygame.display.flip()
 

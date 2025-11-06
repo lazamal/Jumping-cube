@@ -19,7 +19,8 @@ class Player(pygame.sprite.Sprite):
 
         self.is_jumping = False
         self.on_ground = True
-        self.is_landing = False
+        self.bounced = True
+
  
 
 
@@ -27,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def movement(self,dt):
-   
+        
         keys = pygame.key.get_pressed()
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a]) 
 
@@ -55,14 +56,25 @@ class Player(pygame.sprite.Sprite):
 
         platform_collisions = pygame.sprite.spritecollide(self, self.platforms, False)
         if platform_collisions:
+
             for platform in platform_collisions:
-                self.on_ground = True
-                self.is_jumping=False
                 self.rect.bottom = platform.rect.top
                 self.speedy = 0
                 self.gravity = GRAVITY
+                if not self.bounced:
+                    self.bounce()
+                else:
+                    
+                    self.on_ground = True
+                    self.is_jumping=False
+                    self.bounced = True
+
+
+     
+
         else:
             self.on_ground = False
+
 
 
 
@@ -71,17 +83,35 @@ class Player(pygame.sprite.Sprite):
             if not self.on_ground:
                 self.speedy += self.gravity * dt
                 self.gravity += 400
+
                 if self.speedy >=10000:
                     self.speedy = 10000
-            self.rect.y += self.speedy * dt
+            movement = self.speedy * dt
+
+            self.rect.y += movement
+
+
+
+
+
+            
+
 
     def jump(self):
+        
         if self.on_ground and not self.is_jumping:
             self.speedy = - (JUMPING_STRENGTH)
             self.is_jumping = True
             self.on_ground = False
+            self.bounced=False
 
-            
+
+    def bounce(self):
+        print('bounce')
+
+        self.speedy = - (JUMPING_STRENGTH/2)
+        self.bounced = True
+        
 
     def update(self,dt):
         self.movement(dt)
