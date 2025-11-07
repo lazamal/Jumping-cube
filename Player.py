@@ -1,6 +1,14 @@
+from enum import Enum, auto
 import pygame
 from settings import *
 
+
+class PlayerState(Enum):
+    IDLE = auto()
+    MOVING = auto()
+    JUMPING=auto()
+    LANDING=auto()
+    BOUNCING=auto()
 
 
 class Player(pygame.sprite.Sprite):
@@ -17,18 +25,37 @@ class Player(pygame.sprite.Sprite):
         self.gravity = GRAVITY
         self.platforms = platforms
 
+        # player states
         self.is_jumping = False
         self.on_ground = True
         self.bounced = True
 
+        self.player_state = PlayerState.IDLE
+
  
 
+    def manage_states(self, state):
+        if state == 'has not jumped yet':
+            self.on_ground = True
+            self.is_jumping=False
+            self.bounced = True
+        elif state == 'jumping':
+            self.is_jumping = True
+            self.on_ground = False
+            self.bounced=False    
+        elif state == 'bouncing':
+            self.bounced = True
+            self.is_jumping=False
+            self.on_ground = False
+        else:
+            print('no such state')
 
+    
 
 
 
     def movement(self,dt):
-        
+
         keys = pygame.key.get_pressed()
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a]) 
 
@@ -64,13 +91,8 @@ class Player(pygame.sprite.Sprite):
                 if not self.bounced:
                     self.bounce()
                 else:
-                    
-                    self.on_ground = True
-                    self.is_jumping=False
-                    self.bounced = True
-
-
-     
+                    self.manage_states('has not jumped yet')
+  
 
         else:
             self.on_ground = False
@@ -91,26 +113,17 @@ class Player(pygame.sprite.Sprite):
             self.rect.y += movement
 
 
-
-
-
             
-
 
     def jump(self):
         
-        if self.on_ground and not self.is_jumping:
+        if self.on_ground and not self.is_jumping and self.bounced:
             self.speedy = - (JUMPING_STRENGTH)
-            self.is_jumping = True
-            self.on_ground = False
-            self.bounced=False
-
+            self.manage_states('jumping')
 
     def bounce(self):
-        print('bounce')
-
         self.speedy = - (JUMPING_STRENGTH/2)
-        self.bounced = True
+        self.manage_states('bouncing')
         
 
     def update(self,dt):
