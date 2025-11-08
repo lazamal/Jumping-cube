@@ -39,7 +39,7 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.running = False
 
-            self.screen.fill("black")
+            self.screen.fill("teal")
             self.all_sprites.update(dt)
             self.all_sprites.draw(self.screen)
 
