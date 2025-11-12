@@ -3,14 +3,6 @@ import pygame
 from settings import *
 
 
-class PlayerState(Enum):
-    IDLE = auto()
-    MOVING_RIGHT = auto()
-    MOVING_LEFT = auto()
-    JUMPING=auto()
-    FALLING=auto()
-    BOUNCING=auto()
-
 class HorizontalState(Enum):
     IDLE = auto()
     MOVING_LEFT = auto()
@@ -28,14 +20,13 @@ class PassiveState(Enum):
     DID_NOT_BOUNCE= auto()
 
 
-
-
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups, platforms):
         super().__init__(groups)
+        self.original_surf =  pygame.Surface((PLAYER_SIZE)).convert_alpha()
+        self.original_surf.fill('white')
+        self.image = self.original_surf
 
-        self.image = pygame.Surface((PLAYER_SIZE))
-        self.image.fill('white')
         self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
 
         self.base_y_speed = 450
@@ -48,6 +39,11 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(0,0)
         self.gravity = GRAVITY
         self.platforms = platforms
+
+        self.rotation = 0
+        self.right_left_rotation = 0
+
+        self.rotation_angle = -450
 
         # player states
 
@@ -79,13 +75,27 @@ class Player(pygame.sprite.Sprite):
         #     self.previous_vertical_state = self.vertical_state
         #     self.vertical_state=VerticalState.FALLING
 
-  
+    def rotate(self, dt):
+
+        if self.right_left_rotation >=1:
+            self.rotation += self.rotation_angle * dt
+        elif self.right_left_rotation <= -1:
+            self.rotation -= self.rotation_angle * dt
+    
+        self.image = pygame.transform.rotozoom(self.original_surf,self.rotation, 1)
+        self.rect = self.image.get_frect(center = (self.rect.center))
+
 
     def movement(self,dt):
 
         keys = pygame.key.get_pressed()
 
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a])
+        self.right_left_rotation =  self.direction.x
+        self.rotate(dt)
+        print(self.rotation)
+
+
         
         # אם זה זז באלחסון תנרמל את המהירות
         if self.direction.length_squared() > 0:
@@ -176,23 +186,22 @@ class Player(pygame.sprite.Sprite):
                 self.previous_vertical_state = self.vertical_state
                 self.vertical_state = VerticalState.DOUBLE_JUMP
             if self.previous_vertical_state==VerticalState.JUMPING and self.vertical_state==VerticalState.DOUBLE_JUMP:
-                print('found the moment')
-                self.speedy=-1800
-                self.gravity=5500
+
+                self.speedy= -1600
+                self.gravity= 5500
+               
                 print(self.speedy)
                 print(self.gravity)
+                print(self.speedy/self.gravity)
 
     def update(self,dt):
         # self.identify_states()
         # print(f'horizontal state is{self.horizontal_state}')
         # print(f'vertical state is{self.vertical_state}')
         # print(f'passive state is{self.passive_state}')
-
-
         self.movement(dt)
         self.double_jump()
         self.jump()
-
         self.apply_gravity(dt)
         self.collisions()
         
