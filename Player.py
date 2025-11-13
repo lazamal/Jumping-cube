@@ -93,7 +93,7 @@ class Player(pygame.sprite.Sprite):
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a])
         self.right_left_rotation =  self.direction.x
         self.rotate(dt)
-        print(self.rotation)
+
 
 
         
@@ -189,16 +189,10 @@ class Player(pygame.sprite.Sprite):
 
                 self.speedy= -1600
                 self.gravity= 5500
-               
-                print(self.speedy)
-                print(self.gravity)
-                print(self.speedy/self.gravity)
+
 
     def update(self,dt):
-        # self.identify_states()
-        # print(f'horizontal state is{self.horizontal_state}')
-        # print(f'vertical state is{self.vertical_state}')
-        # print(f'passive state is{self.passive_state}')
+
         self.movement(dt)
         self.double_jump()
         self.jump()
