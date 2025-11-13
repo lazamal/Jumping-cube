@@ -40,10 +40,6 @@ class Player(pygame.sprite.Sprite):
         self.gravity = GRAVITY
         self.platforms = platforms
 
-        self.rotation = 0
-        self.right_left_rotation = 0
-
-        self.rotation_angle = -450
 
         # player states
 
@@ -52,38 +48,59 @@ class Player(pygame.sprite.Sprite):
         self.passive_state = PassiveState.BOUNCED
         self.previous_vertical_state = VerticalState.GROUNDED
 
-                  
+        # Rotation
+        # lerp needs:
+        #  a - starting rotation point
+        # b - finishing rotation point
+        # t - where i am in the animation
 
-    def identify_states(self):
-        
-        if self.direction.x> 0:
-            self.horizontal_state=HorizontalState.MOVING_RIGHT
-        elif self.direction.x<0:
-            self.horizontal_state=HorizontalState.MOVING_LEFT
+        # state managment needs
+        # rotating? - boolean
+
+        # rotation function needs
+        # how much to rotate each frame
+        # direction
+        # they are represented in the same variable
+        # rotation = rotation speed (maybe 50) * dt
+        self.starting_rotation = 0
+        self.ending_rotation = 0
+        self.t = 0
+        self.rotation_state = False
+        self.rotation = 0
+        self.rotation_direction = 0
+        self.rotation_duration = 0.25
+        self.last_rotation_direction = self.rotation_direction
+
+    def start_rotation(self, direction, target, duration):
+
+        if not self.rotation_state:
+            self.rotation_state = True
+            self.starting_rotation = self.rotation
+            self.ending_rotation = self.starting_rotation + target * direction
+            self.t = 0
+            self.rotation_duration = duration
+
+    def update_rotation(self, dt):
+
+
+
+        self.t += dt / self.rotation_duration
+
+        if self.t>= 1:
+            # if you finished rotation "snap to target"
+            # means set all values to the finishing state to prevent errors
+            self.t=1
+            self.rotation = self.ending_rotation
+            self.rotation_state = False
+            self.image = pygame.transform.rotate(self.original_surf, self.rotation)
+            self.rect = self.image.get_rect(center=self.rect.center)
         else:
-            self.horizontal_state=HorizontalState.IDLE
+ 
+            self.rotation = self.starting_rotation + (self.ending_rotation-self.starting_rotation) * self.t
 
-        if self.speedy<0:
-            self.previous_vertical_state = self.vertical_state
-            self.vertical_state=VerticalState.JUMPING
+            self.image = pygame.transform.rotate(self.original_surf, self.rotation)
+            self.rect = self.image.get_rect(center = (self.rect.center))
 
-        if self.passive_state == PassiveState.BOUNCED and self.speedy<0:
-            self.previous_vertical_state = self.vertical_state
-            self.vertical_state=VerticalState.BOUNCING
-
-        # elif self.previous_y_pos<self.rect.y:
-        #     self.previous_vertical_state = self.vertical_state
-        #     self.vertical_state=VerticalState.FALLING
-
-    def rotate(self, dt):
-
-        if self.right_left_rotation >=1:
-            self.rotation += self.rotation_angle * dt
-        elif self.right_left_rotation <= -1:
-            self.rotation -= self.rotation_angle * dt
-    
-        self.image = pygame.transform.rotozoom(self.original_surf,self.rotation, 1)
-        self.rect = self.image.get_frect(center = (self.rect.center))
 
 
     def movement(self,dt):
@@ -91,8 +108,11 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
 
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a])
-        self.right_left_rotation =  self.direction.x
-        self.rotate(dt)
+        self.rotation_direction =  self.direction.x * -1
+        if self.rotation_direction != 0: self.last_rotation_direction = self.rotation_direction
+        if not self.rotation_state and self.direction.x != 0:
+            self.start_rotation(self.rotation_direction, 90, 0.15)
+
 
 
 
@@ -173,6 +193,7 @@ class Player(pygame.sprite.Sprite):
         self.passive_state=PassiveState.BOUNCED
         self.previous_vertical_state = self.vertical_state
         self.vertical_state=VerticalState.BOUNCING
+        self.start_rotation(self.last_rotation_direction,180,0.25)
 
 
 
@@ -192,13 +213,13 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self,dt):
-
+        self.update_rotation(dt)
         self.movement(dt)
         self.double_jump()
         self.jump()
         self.apply_gravity(dt)
         self.collisions()
-        
+
 
 
 
