@@ -101,7 +101,7 @@ class Player(pygame.sprite.Sprite):
                 self.rect.centerx = self.ending_movement
                 self.horizontal_state = HorizontalState.IDLE
             else:
-                print(self.rect.centerx)
+                
                 self.rect.centerx = lerp(self.starting_movement, self.ending_movement, self.movement_t)
 
 
@@ -144,8 +144,8 @@ class Player(pygame.sprite.Sprite):
         self.rotation_direction =  self.direction.x * -1
         if self.rotation_direction != 0: self.last_rotation_direction = self.rotation_direction
         if self.rotation_state == Rotating.IDLE and self.direction.x != 0:
-            self.start_rotation(self.rotation_direction, 90, 0.1)
-            self.start_movement(self.direction.x, PLAYER_SIZE[0], 0.1) 
+            self.start_rotation(self.rotation_direction, 90, MOVEMENT_SPEED)
+            self.start_movement(self.direction.x, PLAYER_SIZE[0], MOVEMENT_SPEED) 
 
 
 
