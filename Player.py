@@ -43,27 +43,22 @@ class Player(pygame.sprite.Sprite):
         self.original_surf =  pygame.Surface((PLAYER_SIZE)).convert_alpha()
         self.original_surf.fill('white')
         self.image = self.original_surf
-
         self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
-
-        self.base_y_speed = 450
-        self.speedx = 500
-
-        self.speedy = self.base_y_speed
-
-        self.previous_speedy = 0
-        self.previous_y_pos = 0 
         self.direction = pygame.Vector2(0,0)
-        self.gravity = GRAVITY
+
+        # interactions
         self.platforms = platforms
 
+        # jump variables
+        self.base_y_speed = 450
+        self.speedy = self.base_y_speed
+        self.previous_speedy = 0
+        self.previous_y_pos = 0 
+        self.gravity = GRAVITY
 
-        # player states
 
-        self.horizontal_state=HorizontalState.IDLE
-        self.vertical_state=VerticalState.GROUNDED
-        self.passive_state = PassiveState.BOUNCED
-        self.previous_vertical_state = VerticalState.GROUNDED
+
+
 
         # rotation animation
         self.starting_rotation = 0
@@ -76,12 +71,19 @@ class Player(pygame.sprite.Sprite):
         self.last_rotation_direction = self.rotation_direction
 
         # Movement Animation
-        self.starting_movement = WINDOW_WIDTH/2
+        self.starting_movement = self.rect.centerx
         self.ending_movement = 0
         self.movement_t = 0
         self.movement_duration = 0.25
 
+        # player states
 
+        self.horizontal_state=HorizontalState.IDLE
+        self.vertical_state=VerticalState.GROUNDED
+        self.passive_state = PassiveState.BOUNCED
+        self.previous_vertical_state = VerticalState.GROUNDED
+
+    
 
     def start_movement(self, direction, target, duration):
         if self.horizontal_state == HorizontalState.IDLE:
