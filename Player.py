@@ -20,8 +20,11 @@ class PassiveState(Enum):
     BOUNCED= auto()
     DID_NOT_BOUNCE= auto()
 
+class Rotating(Enum):
+    IDLE = auto()
+    ROTATING= auto()
+
 #  to do next: make it so the movement is bound to the rotation
-# psuedo code:
 # implement the leniar interpolation but use the same t progression to track
 #  when the cube finishes a distance that is equal to one of its faces.
 #  90 degrees is equal to the length of 1 cube face
@@ -33,6 +36,9 @@ class PassiveState(Enum):
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups, platforms):
+
+
+
         super().__init__(groups)
         self.original_surf =  pygame.Surface((PLAYER_SIZE)).convert_alpha()
         self.original_surf.fill('white')
@@ -63,16 +69,47 @@ class Player(pygame.sprite.Sprite):
         self.starting_rotation = 0
         self.ending_rotation = 0
         self.t = 0
-        self.rotation_state = False
+        self.rotation_state = Rotating.IDLE
         self.rotation = 0
         self.rotation_direction = 0
         self.rotation_duration = 0.25
         self.last_rotation_direction = self.rotation_direction
 
+        # Movement Animation
+        self.starting_movement = WINDOW_WIDTH/2
+        self.ending_movement = 0
+        self.movement_t = 0
+        self.movement_duration = 0.25
+
+
+
+    def start_movement(self, direction, target, duration):
+        if self.horizontal_state == HorizontalState.IDLE:
+            self.horizontal_state = (
+            HorizontalState.MOVING_RIGHT if direction > 0 else HorizontalState.MOVING_LEFT
+        )
+            self.starting_movement = self.rect.centerx
+            self.ending_movement = self.starting_movement + target * direction
+            self.movement_t = 0
+            self.movement_duration = duration
+
+    def update_movement(self,dt):
+        if self.horizontal_state != HorizontalState.IDLE:
+            self.movement_t += dt / self.movement_duration
+            if self.movement_t >= 1:
+                self.movement_t=1
+                self.rect.centerx = self.ending_movement
+                self.horizontal_state = HorizontalState.IDLE
+            else:
+                print(self.rect.centerx)
+                self.rect.centerx = lerp(self.starting_movement, self.ending_movement, self.movement_t)
+
+
+
     def start_rotation(self, direction, target, duration):
 
-        if not self.rotation_state:
-            self.rotation_state = True
+        if self.rotation_state == Rotating.IDLE:
+            self.rotation_state = Rotating.ROTATING
             self.starting_rotation = self.rotation
             self.ending_rotation = self.starting_rotation + target * direction
             self.t = 0
@@ -89,7 +126,7 @@ class Player(pygame.sprite.Sprite):
             # means set all values to the finishing state to prevent errors
             self.t=1
             self.rotation = self.ending_rotation
-            self.rotation_state = False
+            self.rotation_state = Rotating.IDLE
             self.image = pygame.transform.rotate(self.original_surf, self.rotation)
             self.rect = self.image.get_rect(center=self.rect.center)
         else:
@@ -106,8 +143,9 @@ class Player(pygame.sprite.Sprite):
         self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a])
         self.rotation_direction =  self.direction.x * -1
         if self.rotation_direction != 0: self.last_rotation_direction = self.rotation_direction
-        if not self.rotation_state and self.direction.x != 0:
-            self.start_rotation(self.rotation_direction, 90, 0.15)
+        if self.rotation_state == Rotating.IDLE and self.direction.x != 0:
+            self.start_rotation(self.rotation_direction, 90, 0.1)
+            self.start_movement(self.direction.x, PLAYER_SIZE[0], 0.1) 
 
 
 
@@ -117,7 +155,7 @@ class Player(pygame.sprite.Sprite):
         if self.direction.length_squared() > 0:
             self.direction = self.direction.normalize()
 
-        self.rect.centerx += self.direction.x * self.speedx * dt
+        # self.rect.centerx += self.direction.x * self.speedx * dt
 
     def collisions(self):
 
@@ -201,6 +239,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self,dt):
         self.update_rotation(dt)
+        self.update_movement(dt)
         self.movement(dt)
         self.double_jump()
         self.jump()
