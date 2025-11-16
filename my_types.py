@@ -24,15 +24,15 @@ class Animation():
 
             self.start = new_start
             self.ending_movement = self.start + target * direction
-            self.movement_t = 0
-            self.movement_duration = duration
+            self.t = 0
+            self.duration = duration
 
     def update_movement(self,dt):
         if self.current_state != self.state(1):
             self.t += dt / self.duration
             if self.t >= 1:
                 self.t=1
-                self.final = self.ending_movement
+                self.final = self.end
                 self.current_state = self.state(1)
             else:
                 
