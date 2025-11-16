@@ -1,39 +1,40 @@
-from enum import Enum, auto
 from utils import lerp
 
-class HorizontalState(Enum):
-    IDLE = auto()
-    MOVING_LEFT = auto()
-    MOVING_RIGHT = auto()
 
 class Animation():
-    def __init__(self, start, end, t, state, direction, duration, final):
-        self.start = start
-        self.end = end
-        self.t = t
-        self.state = state
-        self.direction = direction
-        self.duration = duration   
-        self.final = final
+    def __init__(self, state_enum):
+        self.start = 0
+        self.end = 0
+        self.t = 0
+        self.state = state_enum
+        self.current_state = state_enum(1)
+        self.direction = 0
+        self.duration = 0
+        self.final = 0
+
 
     def start_movement(self, new_start, target, direction, duration):
-        if self.state == HorizontalState.IDLE:
-            self.state = (
-            HorizontalState.MOVING_RIGHT if direction > 0 else HorizontalState.MOVING_LEFT
-        )
+        if self.current_state == self.state(1):
+            if len(self.state) > 2:
+                self.current_state = (
+                self.state(2) if direction > 0 else self.state(3)
+            )
+            else:
+                self.current_state = self.state(2)
+
             self.start = new_start
             self.ending_movement = self.start + target * direction
             self.movement_t = 0
             self.movement_duration = duration
 
     def update_movement(self,dt):
-        if self.state != HorizontalState.IDLE:
+        if self.current_state != self.state(1):
             self.t += dt / self.duration
             if self.t >= 1:
                 self.t=1
                 self.final = self.ending_movement
-                self.state = HorizontalState.IDLE
+                self.current_state = self.state(1)
             else:
                 
-                self.final = lerp(self.starting_movement, self.ending_movement, self.movement_t)
-                return self.final
+                self.final = lerp(self.start, self.end, self.t)
+                return self.final, self.current_state

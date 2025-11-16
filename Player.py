@@ -25,22 +25,11 @@ class Rotating(Enum):
     IDLE = auto()
     ROTATING= auto()
 
-#  to do next: make it so the movement is bound to the rotation
-# implement the leniar interpolation but use the same t progression to track
-#  when the cube finishes a distance that is equal to one of its faces.
-#  90 degrees is equal to the length of 1 cube face
-# change the name of movement to "handle input"
-# create 2 seperate functions: 1 to "activate movement"
-# and another "update movement"
-# just like the rotation solution
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups, platforms):
-
-
-
         super().__init__(groups)
+
         self.original_surf =  pygame.Surface((PLAYER_SIZE)).convert_alpha()
         self.original_surf.fill('white')
         self.image = self.original_surf
@@ -71,9 +60,8 @@ class Player(pygame.sprite.Sprite):
         self.rotation_duration = 0.25
         self.last_rotation_direction = self.rotation_direction
 
-        self.movement_obj=Animation(self.rect.centerx, 0, 0, HorizontalState.IDLE, 0, MOVEMENT_SPEED, 0)
-        self.rotation_obj = Animation(0,0,0,Rotating.IDLE,0,MOVEMENT_SPEED,0)
-        self.rotation_obj.last_rotation_direction = self.rotation_obj.direction_of_animation
+        self.movement_animation =  Animation(HorizontalState)
+        self.rotation_animation = Animation(Rotating)
 
         # Movement Animation
         self.starting_movement = self.rect.centerx
@@ -86,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         self.horizontal_state=HorizontalState.IDLE
         self.vertical_state=VerticalState.GROUNDED
         self.passive_state = PassiveState.BOUNCED
-        self.previous_vertical_state = VerticalState.GROUNDED
+        self.previous_vertical_state = self.vertical_state
 
     
 
@@ -124,8 +112,6 @@ class Player(pygame.sprite.Sprite):
 
     def update_rotation(self, dt):
 
-
-
         self.t += dt / self.rotation_duration
 
         if self.t>= 1:
@@ -153,16 +139,10 @@ class Player(pygame.sprite.Sprite):
         if self.rotation_state == Rotating.IDLE and self.direction.x != 0:
             self.start_rotation(self.rotation_direction, 90, MOVEMENT_SPEED)
             self.start_movement(self.direction.x, PLAYER_SIZE[0], MOVEMENT_SPEED) 
-
-
-
-
         
         # אם זה זז באלחסון תנרמל את המהירות
         if self.direction.length_squared() > 0:
             self.direction = self.direction.normalize()
-
-        # self.rect.centerx += self.direction.x * self.speedx * dt
 
     def collisions(self):
 
@@ -195,7 +175,6 @@ class Player(pygame.sprite.Sprite):
 
             if not self.vertical_state==VerticalState.GROUNDED:
                 self.previous_speedy = self.speedy
-                # self.speedy += self.gravity * dt
                 self.gravity += 400
                 
                 if self.speedy >=10000:
@@ -213,7 +192,7 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
 
-        if pygame.key.get_pressed()[pygame.K_SPACE]:
+        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
             if self.vertical_state==VerticalState.GROUNDED and self.passive_state==PassiveState.BOUNCED:
                 self.previous_speedy = self.speedy
                 self.speedy = - (JUMPING_STRENGTH)
@@ -221,6 +200,7 @@ class Player(pygame.sprite.Sprite):
                 self.passive_state=PassiveState.DID_NOT_BOUNCE
                 self.previous_vertical_state = self.vertical_state
                 self.vertical_state=VerticalState.JUMPING
+                
 
     def bounce(self):
         self.previous_speedy = self.speedy
@@ -231,11 +211,8 @@ class Player(pygame.sprite.Sprite):
         self.start_rotation(self.last_rotation_direction,180,0.25)
 
     def double_jump(self):
-
-        if self.vertical_state==VerticalState.JUMPING and not self.passive_state==PassiveState.BOUNCED:
-
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
-                
+        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+            if self.vertical_state==VerticalState.JUMPING and not self.passive_state==PassiveState.BOUNCED:
                 self.speedy -= (JUMPING_STRENGTH)
                 self.previous_vertical_state = self.vertical_state
                 self.vertical_state = VerticalState.DOUBLE_JUMP
@@ -244,14 +221,16 @@ class Player(pygame.sprite.Sprite):
                 self.speedy= -1600
                 self.gravity= 5500
 
+
     def update(self,dt):
         self.update_rotation(dt)
         self.update_movement(dt)
         self.movement(dt)
-        self.double_jump()
         self.jump()
+        self.double_jump()
         self.apply_gravity(dt)
         self.collisions()
+
 
 
 
