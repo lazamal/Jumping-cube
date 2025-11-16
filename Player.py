@@ -15,7 +15,10 @@ class VerticalState(Enum):
     FALLING=auto()
     BOUNCING=auto()
     GROUNDED=auto()
-    DOUBLE_JUMP = auto()
+
+class DoubleJumps(Enum):
+    yes = auto()
+    no = auto()
 
 class PassiveState(Enum):
     BOUNCED= auto()
@@ -75,6 +78,7 @@ class Player(pygame.sprite.Sprite):
         self.vertical_state=VerticalState.GROUNDED
         self.passive_state = PassiveState.BOUNCED
         self.previous_vertical_state = self.vertical_state
+        self.double_jump_state = DoubleJumps.no
 
     
 
@@ -160,6 +164,7 @@ class Player(pygame.sprite.Sprite):
         if platform_collisions:
 
             for platform in platform_collisions:
+                
                 self.rect.bottom = platform.rect.top
                 self.previous_speedy = self.speedy
                 self.speedy = 0
@@ -169,6 +174,8 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.previous_vertical_state = self.vertical_state
                     self.vertical_state = VerticalState.GROUNDED
+                    self.double_jump_state = DoubleJumps.no
+
  
     def apply_gravity(self,dt):
             
@@ -181,8 +188,6 @@ class Player(pygame.sprite.Sprite):
                     self.speedy = 10000
                 if self.gravity >=10000:
                     self.gravity=10000
-
-
             self.speedy += self.gravity * dt
 
             movement = self.speedy * dt
@@ -211,23 +216,21 @@ class Player(pygame.sprite.Sprite):
         self.start_rotation(self.last_rotation_direction,180,0.25)
 
     def double_jump(self):
-        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
-            if self.vertical_state==VerticalState.JUMPING and not self.passive_state==PassiveState.BOUNCED:
-                self.speedy -= (JUMPING_STRENGTH)
-                self.previous_vertical_state = self.vertical_state
-                self.vertical_state = VerticalState.DOUBLE_JUMP
-            if self.previous_vertical_state==VerticalState.JUMPING and self.vertical_state==VerticalState.DOUBLE_JUMP:
-
-                self.speedy= -1600
-                self.gravity= 5500
-
+            if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+                if self.vertical_state==VerticalState.JUMPING and self.passive_state==PassiveState.DID_NOT_BOUNCE and self.double_jump_state == DoubleJumps.no:
+             
+                        self.double_jump_state=DoubleJumps.yes
+                        self.speedy= -1600
+                        self.gravity= 5500
+                
 
     def update(self,dt):
         self.update_rotation(dt)
         self.update_movement(dt)
         self.movement(dt)
-        self.jump()
         self.double_jump()
+        self.jump()
+
         self.apply_gravity(dt)
         self.collisions()
 
