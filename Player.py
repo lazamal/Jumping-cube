@@ -2,6 +2,7 @@ from enum import Enum, auto
 import pygame
 from settings import *
 from utils import lerp
+from my_types import Animation
 
 
 class HorizontalState(Enum):
@@ -69,6 +70,10 @@ class Player(pygame.sprite.Sprite):
         self.rotation_direction = 0
         self.rotation_duration = 0.25
         self.last_rotation_direction = self.rotation_direction
+
+        self.movement_obj=Animation(self.rect.centerx, 0, 0, HorizontalState.IDLE, 0, MOVEMENT_SPEED, 0)
+        self.rotation_obj = Animation(0,0,0,Rotating.IDLE,0,MOVEMENT_SPEED,0)
+        self.rotation_obj.last_rotation_direction = self.rotation_obj.direction_of_animation
 
         # Movement Animation
         self.starting_movement = self.rect.centerx
