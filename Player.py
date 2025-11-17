@@ -3,6 +3,7 @@ import pygame
 from settings import *
 from utils import lerp
 from my_types import Animation
+from PlayerState import player_state
 
 
 class HorizontalState(Enum):
@@ -50,9 +51,6 @@ class Player(pygame.sprite.Sprite):
         self.gravity = GRAVITY
 
 
-
-
-
         # rotation animation
         self.starting_rotation = 0
         self.ending_rotation = 0
@@ -63,8 +61,6 @@ class Player(pygame.sprite.Sprite):
         self.rotation_duration = 0.25
         self.last_rotation_direction = self.rotation_direction
 
-        self.movement_animation =  Animation(HorizontalState)
-        self.rotation_animation = Animation(Rotating)
 
         # Movement Animation
         self.starting_movement = self.rect.centerx

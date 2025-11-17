@@ -1,13 +1,7 @@
-from enum import Enum, auto
+from enum import Enum, Flag, auto
+from dataclasses import dataclass
 
-class VerticalState(Enum):
-    
-    JUMPING=auto()
-    FALLING=auto()
-    BOUNCING=auto()
-    GROUNDED=auto()
-    DOUBLE_JUMP = auto()
 
-state = VerticalState
 
-print(state(1))
+for state in player_state:
+    print(state)
