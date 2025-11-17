@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from states import *
 
 @dataclass
@@ -10,15 +10,16 @@ class PlayerState():
     rotate : RotateState
 
     def __iter__(self):
-        yield self.horizontal
-        yield self.vertical
-        yield self.double_jump
-        yield self.bounce
-        yield self.rotate
+        for state in fields(self):
+            yield state.name, state.type, getattr(self, state.name)
 
-player_state = PlayerState(
+
+PLAYER_STATE = PlayerState(
     horizontal=HorizontalState.IDLE,
     vertical=VerticalState.GROUNDED,
-    bounced=BounceState.BOUNCED,
-    double_jumps=DoubleJumpState.NO,
-    rotating=RotateState.IDLE )
+    bounce=BounceState.BOUNCED,
+    double_jump=DoubleJumpState.NO,
+    rotate=RotateState.IDLE )
+
+for name, type, value in PLAYER_STATE:
+    print(name, type, value)
