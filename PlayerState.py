@@ -20,6 +20,3 @@ PLAYER_STATE = PlayerState(
     bounce=BounceState.BOUNCED,
     double_jump=DoubleJumpState.NO,
     rotate=RotateState.IDLE )
-
-for name, type, value in PLAYER_STATE:
-    print(name, type, value)
