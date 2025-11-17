@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.previous_y_pos = 0 
         self.gravity = GRAVITY
 
-
+        # Animations
         self.rotation = Animation('rotate', RotateState.ROTATING)
         self.movement_obj = Animation('horizontal',HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
         
@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
 
         keys = pygame.key.get_pressed()
 
-        self.direction.x = int(keys[pygame.K_d])-int(keys[pygame.K_a])
+        self.direction.x = int(keys[pygame.K_d] or keys[pygame.K_RIGHT])-int(keys[pygame.K_a] or keys[pygame.K_LEFT])
 
         if PLAYER_STATE.horizontal == HorizontalState.IDLE and self.direction.x != 0:
             self.rotation.direction =  self.direction.x * -1
