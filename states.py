@@ -22,3 +22,9 @@ class BounceState(Enum):
 class RotateState(Enum):
     IDLE = auto()
     ROTATING= auto()
+
+class ShapeState(Enum):
+    IDLE_SQUARE = auto()
+    IDLE_CIRCLE = auto()
+    MORPH_TO_SQUARE = auto()
+    MORPH_TO_CIRCLE =auto()

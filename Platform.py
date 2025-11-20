@@ -7,7 +7,7 @@ class Platform(pygame.sprite.Sprite):
         super().__init__(groups)
 
         self.image = pygame.Surface((size))
-        self.image.fill('brown')
+        self.image.fill(PLATFORM_COLOR)
         self.rect = self.image.get_rect(midbottom = pos)
 
     def create_random_platforms( platforms_to_create, groups):

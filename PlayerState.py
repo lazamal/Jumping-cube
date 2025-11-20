@@ -8,6 +8,7 @@ class PlayerState():
     bounce: BounceState
     double_jump : DoubleJumpState
     rotate : RotateState
+    shape: ShapeState
 
     def __iter__(self):
         for state in fields(self):
@@ -19,4 +20,5 @@ PLAYER_STATE = PlayerState(
     vertical=VerticalState.GROUNDED,
     bounce=BounceState.BOUNCED,
     double_jump=DoubleJumpState.NO,
-    rotate=RotateState.IDLE )
+    rotate=RotateState.IDLE,
+    shape = ShapeState.IDLE_SQUARE )

@@ -20,6 +20,8 @@ class Animation():
         setattr(PLAYER_STATE, self.state_to_change, self.new_state_value)
         self.start = current_position
         self.end = self.start + target * direction
+        if target == 0:
+            self.end = 0
         self.t = 0
         self.duration = duration
 
