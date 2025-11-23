@@ -32,6 +32,11 @@ class Player(pygame.sprite.Sprite):
         self.morph_circle = Animation('shape', ShapeState.MORPH_TO_CIRCLE)
         self.morph_square = Animation('shape', ShapeState.MORPH_TO_SQUARE)
 
+    def draw_player_again(self):
+        self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
+        pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
+        self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
+
     def morph(self):
         keys = pygame.key.get_just_pressed()
 
@@ -112,7 +117,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def double_jump(self):
-            if pygame.key.get_just_pressed()[pygame.K_w]:
+            if pygame.key.get_just_pressed()[pygame.K_w] or pygame.key.get_just_pressed()[pygame.K_UP]:
                 if PLAYER_STATE.vertical==VerticalState.JUMPING and PLAYER_STATE.bounce==BounceState.DID_NOT_BOUNCE and PLAYER_STATE.double_jump == DoubleJumpState.NO:
              
                         PLAYER_STATE.double_jump=DoubleJumpState.YES
@@ -120,6 +125,9 @@ class Player(pygame.sprite.Sprite):
                         self.gravity= 5500
 
     def update_animations(self, dt):
+
+
+
         if PLAYER_STATE.rotate == RotateState.ROTATING:
             self.rotation.lerp_value = self.rotation.update(dt, RotateState.IDLE)
             self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
@@ -127,20 +135,16 @@ class Player(pygame.sprite.Sprite):
 
         if PLAYER_STATE.horizontal != HorizontalState.IDLE:
             self.rect.centerx = self.movement_obj.update(dt,HorizontalState.IDLE)
+            self.draw_player_again()
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
             self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE))
-            self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
-            pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
-            self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
+
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_SQUARE:
-            print(f'{self.border_radius} a')
             self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))
-            print(f'{self.border_radius} b')
-            self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
-            pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
-            self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
+            self.draw_player_again()
+
 
                 
 
