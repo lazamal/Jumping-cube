@@ -96,7 +96,7 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
 
-        if pygame.key.get_just_pressed()[pygame.K_w]:
+        if pygame.key.get_just_pressed()[pygame.K_w] or pygame.key.get_just_pressed()[pygame.K_UP] :
             if PLAYER_STATE.vertical==VerticalState.GROUNDED and PLAYER_STATE.bounce==BounceState.BOUNCED:
                 self.speedy = - (JUMPING_STRENGTH)
                 PLAYER_STATE.bounce = BounceState.DID_NOT_BOUNCE
