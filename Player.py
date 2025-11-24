@@ -143,6 +143,7 @@ class Player(pygame.sprite.Sprite):
             self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
+
         if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE:
                 self.image = draw_circle()
                 self.rect = self.original_surf.get_rect(center=self.rect.center)
