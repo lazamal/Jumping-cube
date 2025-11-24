@@ -14,7 +14,6 @@ class Animation():
         self.last_direction: int = self.direction
         self.state_to_change: str = state_to_change
         self.new_state_value : Enum = new_state_value
-        self.lerp_value : int = 0
 
 
     def start_animation(self, direction, duration, target, current_position) -> None:
@@ -26,12 +25,12 @@ class Animation():
         self.t = 0
         self.duration = duration
 
-    def update(self, dt, idle_state : Enum):
+    def update(self, dt, end_state : Enum):
         self.t += dt / self.duration
         # snap to target
         if self.t >= 1:
             self.t=1
-            setattr(PLAYER_STATE, self.state_to_change,idle_state )
+            setattr(PLAYER_STATE, self.state_to_change, end_state )
 
             return self.end
         else:

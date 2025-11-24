@@ -18,7 +18,6 @@ class Player(pygame.sprite.Sprite):
         self.image = self.original_surf
         self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
 
-
         # interactions
         
         self.platforms = platforms
@@ -33,12 +32,10 @@ class Player(pygame.sprite.Sprite):
         self.movement_obj = Animation('horizontal',HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
         self.morph_circle = Animation('shape', ShapeState.MORPH_TO_CIRCLE)
         self.morph_square = Animation('shape', ShapeState.MORPH_TO_SQUARE)
- 
-    
+   
     def morph(self):
-      
-
-        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+  
+          if pygame.key.get_just_pressed()[pygame.K_SPACE]:
             match PLAYER_STATE.shape:
                 case  ShapeState.IDLE_SQUARE:
                     self.morph_circle.start_animation(1,0.5,int(PLAYER_SIZE[0]/2), 0)
@@ -128,7 +125,6 @@ class Player(pygame.sprite.Sprite):
             self.rotation.lerp_value = self.rotation.update(dt, RotateState.IDLE)
             self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
             self.rect = self.image.get_rect(center=self.rect.center)
-
             
         if PLAYER_STATE.horizontal != HorizontalState.IDLE:
 
@@ -137,19 +133,14 @@ class Player(pygame.sprite.Sprite):
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
             self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
-            if self.morph_circle.t > 0.5:
-                self.image= draw_circle()
-                self.rect = self.original_surf.get_rect(center=self.rect.center)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_SQUARE:
             self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
-
         if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE:
                 self.image = draw_circle()
                 self.rect = self.original_surf.get_rect(center=self.rect.center)
-
 
 
     def update(self,dt):
