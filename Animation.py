@@ -1,3 +1,4 @@
+from typing import Callable
 from PlayerState import PLAYER_STATE
 from states import *
 from utils import lerp
@@ -27,9 +28,11 @@ class Animation():
 
     def update(self, dt, idle_state : Enum):
         self.t += dt / self.duration
+        # snap to target
         if self.t >= 1:
             self.t=1
             setattr(PLAYER_STATE, self.state_to_change,idle_state )
+
             return self.end
         else:
             return lerp(self.start, self.end, self.t)

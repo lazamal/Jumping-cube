@@ -4,6 +4,7 @@ from settings import *
 from PlayerState import PLAYER_STATE
 from states import *
 from Animation import Animation
+from utils import *
 
 
 class Player(pygame.sprite.Sprite):
@@ -15,10 +16,12 @@ class Player(pygame.sprite.Sprite):
         self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
         pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
         self.image = self.original_surf
-        self.rect = self.image.get_rect(center = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
+        self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
+        self.mask = pygame.mask.from_surface(self.image)
 
 
         # interactions
+        
         self.platforms = platforms
 
         # physics variables
@@ -31,11 +34,12 @@ class Player(pygame.sprite.Sprite):
         self.movement_obj = Animation('horizontal',HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
         self.morph_circle = Animation('shape', ShapeState.MORPH_TO_CIRCLE)
         self.morph_square = Animation('shape', ShapeState.MORPH_TO_SQUARE)
-
+ 
+    
     def morph(self):
-        keys = pygame.key.get_just_pressed()
+      
 
-        if keys[pygame.K_SPACE]:
+        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
             match PLAYER_STATE.shape:
                 case  ShapeState.IDLE_SQUARE:
                     self.morph_circle.start_animation(1,0.5,int(PLAYER_SIZE[0]/2), 0)
@@ -118,6 +122,7 @@ class Player(pygame.sprite.Sprite):
                         PLAYER_STATE.double_jump=DoubleJumpState.YES
                         self.speedy= -1600
                         self.gravity= 5500
+                        
 
     def update_animations(self, dt):
         if PLAYER_STATE.rotate == RotateState.ROTATING:
@@ -125,34 +130,34 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
             self.rect = self.image.get_rect(center=self.rect.center)
 
+            
         if PLAYER_STATE.horizontal != HorizontalState.IDLE:
+
             self.rect.centerx = self.movement_obj.update(dt,HorizontalState.IDLE)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
             self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE))
-            self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
-            pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
-            self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
+            self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_SQUARE:
-            print(f'{self.border_radius} a')
             self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))
-            print(f'{self.border_radius} b')
-            self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
-            pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
-            self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
+            self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
-                
+        if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE:
+                self.image = draw_circle()
+                self.rect = self.original_surf.get_rect(center=self.rect.center)
+
+
 
     def update(self,dt):
-        
-        self.update_animations(dt)
         self.morph()
         self.movement()
         self.double_jump()
         self.jump()
         self.apply_gravity(dt)
+        self.update_animations(dt)
         self.collisions()
+
 
 
 
