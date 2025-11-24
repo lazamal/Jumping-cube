@@ -17,7 +17,6 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
         self.image = self.original_surf
         self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
-        self.mask = pygame.mask.from_surface(self.image)
 
 
         # interactions
@@ -138,6 +137,9 @@ class Player(pygame.sprite.Sprite):
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
             self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
+            if self.morph_circle.t > 0.5:
+                self.image= draw_circle()
+                self.rect = self.original_surf.get_rect(center=self.rect.center)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_SQUARE:
             self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))

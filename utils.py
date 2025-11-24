@@ -19,11 +19,9 @@ def draw_circle():
     return surface
 
 def draw_morphing_square_circle(border_radius, rotation):
-        # helper function for later
 
         surface = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
 
-        # self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
         pygame.draw.rect(surface, PLAYER_COLOR, surface.get_rect(), border_radius=border_radius)
         image = pygame.transform.rotate(surface, rotation)
         return image
