@@ -2,6 +2,7 @@ from typing import Callable
 from PlayerState import PLAYER_STATE
 from states import *
 from utils import lerp
+from easings_functions import *
 
 
 class Animation():
@@ -13,7 +14,7 @@ class Animation():
         self.direction: int = 0
         self.last_direction: int = self.direction
         self.state_to_change: str = state_to_change
-        self.new_state_value : Enum = new_state_value
+        self.new_state_value : StrEnum = new_state_value
 
 
     def start_animation(self, direction, duration, target, current_position) -> None:
@@ -25,7 +26,7 @@ class Animation():
         self.t = 0
         self.duration = duration
 
-    def update(self, dt, end_state : Enum):
+    def update(self, dt, end_state : StrEnum, easing = linear):
         self.t += dt / self.duration
         # snap to target
         if self.t >= 1:
@@ -34,5 +35,5 @@ class Animation():
 
             return self.end
         else:
-            return lerp(self.start, self.end, self.t)
+            return lerp(self.start, self.end, self.t, easing=easing )
 

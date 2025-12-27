@@ -1,8 +1,11 @@
 import pygame
 from settings import *
+import math
+from easings_functions import *
 
-def lerp(a,b,t):
-    return a + (b-a) * t
+def lerp(a, b, t, easing):
+    return a + (b - a) * easing(t)
+
 
 def draw_circle():
 

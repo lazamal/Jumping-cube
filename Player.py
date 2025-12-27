@@ -5,6 +5,7 @@ from PlayerState import PLAYER_STATE
 from states import *
 from Animation import Animation
 from utils import *
+import json
 
 
 class Player(pygame.sprite.Sprite):
@@ -32,10 +33,20 @@ class Player(pygame.sprite.Sprite):
         self.movement_obj = Animation('horizontal',HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
         self.morph_circle = Animation('shape', ShapeState.MORPH_TO_CIRCLE)
         self.morph_square = Animation('shape', ShapeState.MORPH_TO_SQUARE)
+
+    def sprint(self):
+        keys = pygame.key.get_just_pressed()
+        if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE or ShapeState.MORPH_TO_CIRCLE and PLAYER_STATE.horizontal != HorizontalState.IDLE:
+            if keys[pygame.K_SPACE]:
+                self.movement_obj.start_animation(self.direction.x, MOVEMENT_SPEED, PLAYER_SIZE[0] * DASH_SPEED, self.rect.centerx)
+                # self.rotation.start_animation(self.rotation.direction, MOVEMENT_SPEED, -90 , 0)
+                if PLAYER_STATE.vertical != VerticalState.GROUNDED:
+                    self.gravity = 0
+                    self.speedy = 0
    
     def morph(self):
   
-          if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+          if pygame.key.get_just_pressed()[pygame.K_LSHIFT]:
             match PLAYER_STATE.shape:
                 case  ShapeState.IDLE_SQUARE:
                     self.morph_circle.start_animation(1,0.5,int(PLAYER_SIZE[0]/2), 0)
@@ -96,7 +107,7 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self):
 
-        if pygame.key.get_just_pressed()[pygame.K_w]:
+        if pygame.key.get_just_pressed()[pygame.K_w] or pygame.key.get_just_pressed()[pygame.K_UP] :
             if PLAYER_STATE.vertical==VerticalState.GROUNDED and PLAYER_STATE.bounce==BounceState.BOUNCED:
                 self.speedy = - (JUMPING_STRENGTH)
                 PLAYER_STATE.bounce = BounceState.DID_NOT_BOUNCE
@@ -112,7 +123,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def double_jump(self):
-            if pygame.key.get_just_pressed()[pygame.K_w]:
+            if pygame.key.get_just_pressed()[pygame.K_w] or pygame.key.get_just_pressed()[pygame.K_UP]:
                 if PLAYER_STATE.vertical==VerticalState.JUMPING and PLAYER_STATE.bounce==BounceState.DID_NOT_BOUNCE and PLAYER_STATE.double_jump == DoubleJumpState.NO:
              
                         PLAYER_STATE.double_jump=DoubleJumpState.YES
@@ -131,11 +142,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.centerx = self.movement_obj.update(dt,HorizontalState.IDLE)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
-            self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE))
+            self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE,easing=easeOutSine ))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_SQUARE:
-            self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE))
+            self.border_radius = int(self.morph_square.update(dt, ShapeState.IDLE_SQUARE, easing=easeInSine))
             self.image = draw_morphing_square_circle(self.border_radius, self.rotation.lerp_value)
 
         if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE:
@@ -145,14 +156,15 @@ class Player(pygame.sprite.Sprite):
 
     def update(self,dt):
         self.morph()
+        self.sprint()
         self.movement()
         self.double_jump()
         self.jump()
         self.apply_gravity(dt)
         self.update_animations(dt)
         self.collisions()
-
-
+       
+        PLAYER_STATE_asJson = json.dumps(dict([[item[0],item[2]] for item in (PLAYER_STATE)]))
 
 
 
