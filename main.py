@@ -2,7 +2,6 @@ import pygame
 from settings import *
 from Player import Player
 from Platform import Platform
-import random
 
 
 
