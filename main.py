@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from Player import Player
 from Platform import Platform
+from tile import Tile
 
 
 
@@ -25,6 +26,7 @@ class Game():
         # Platform.create_random_platforms(6, (self.all_sprites,self.platforms))
         self.platform = Platform((self.all_sprites,self.platforms),(WINDOW_WIDTH/2,WINDOW_HEIGHT), PLATFORM_SIZE )
         self.player = Player(self.all_sprites, self.platforms)
+        self.tile = Tile((self.all_sprites,self.platforms))
 
 
     def run(self):
