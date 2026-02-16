@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
         self.morph_circle = Animation('shape', ShapeState.MORPH_TO_CIRCLE)
         self.morph_square = Animation('shape', ShapeState.MORPH_TO_SQUARE)
 
-    def sprint(self):
+    def dash(self):
         keys = pygame.key.get_just_pressed()
         if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE or ShapeState.MORPH_TO_CIRCLE and PLAYER_STATE.horizontal != HorizontalState.IDLE:
             if keys[pygame.K_SPACE]:
@@ -156,7 +156,8 @@ class Player(pygame.sprite.Sprite):
 
     def update(self,dt):
         self.morph()
-        self.sprint()
+        # i dont like how it feels so i disabled it
+        # self.dash()
         self.movement()
         self.double_jump()
         self.jump()
