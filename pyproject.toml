@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jumping-cube"
+version = "0.1.0"
+description = "3D graphics and AI project"
+authors = ["Dor Lazarov <lazamal@gmail.com>"]
+package-mode = false 
+
+[tool.poetry.dependencies]
+python = "^3.13"
+"pygame-ce" = "^2.5.7"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependencies] = [
+    "pygame-ce"
+]
