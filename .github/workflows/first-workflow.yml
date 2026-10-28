@@ -7,5 +7,10 @@ jobs:
     smoke-test:
         runs-on: ubuntu-latest
         steps: 
-            - run: ls
-            - run: echo "hi there"
+            - uses: actions/checkout@v7
+            - uses: actions/setup-python@v6
+              with:
+                python-version: "3.13"
+            - run: pip install poetry
+            - run: poetry install --no-root
+            - run: poetry run pytest
