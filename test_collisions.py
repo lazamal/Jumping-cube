@@ -10,7 +10,7 @@ import pytest
 @pytest.fixture
 def platform_group():
     platform = pygame.sprite.Group()
-    # return platform
+    return platform
 
 @pytest.fixture
 def all_sprites_group():
