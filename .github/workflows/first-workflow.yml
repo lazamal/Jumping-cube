@@ -4,7 +4,7 @@ on:
     push
 
 jobs:
-    smoke-test:
+    test-code:
         runs-on: ubuntu-latest
         steps: 
             - uses: actions/checkout@v7
@@ -15,3 +15,8 @@ jobs:
             - run: pip install poetry
             - run: poetry install --no-root
             - run: poetry run pytest
+    deploy-to-prod-mock:
+        needs: test-code
+        runs-on: ubuntu-latest
+        steps:
+            - run: echo "Deployed to prod practice"
