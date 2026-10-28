@@ -8,12 +8,13 @@ jobs:
         runs-on: ubuntu-latest
         steps: 
             - uses: actions/checkout@v7
+            - run: pip install poetry
             - uses: actions/setup-python@v6
               with:
                 python-version: "3.13"
                 cache: "poetry"
             - run: ls
-            - run: pip install poetry
+
             - run: poetry install --no-root
             - run: poetry run pytest
     deploy-to-prod-mock:
