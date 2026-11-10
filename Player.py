@@ -20,8 +20,8 @@ class Player(pygame.sprite.Sprite):
         self.original_surf = pygame.Surface(PLAYER_SIZE, pygame.SRCALPHA)
         pygame.draw.rect(self.original_surf, PLAYER_COLOR, self.original_surf.get_rect(), border_radius=self.border_radius)
         self.image = self.original_surf
-        self.physics_rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
-        self.drawing_rect = pygame.Rect.copy(self.physics_rect)
+        self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
+        self.drawing_rect = pygame.Rect.copy(self.rect)
         
         # interactions
         
@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
         if PLAYER_STATE.horizontal == HorizontalState.IDLE and self.direction.x != 0:
             self.rotation.direction =  self.direction.x * -1
             self.rotation.start_animation(self.rotation.direction, MOVEMENT_SPEED, 90, 0, RotateState.ROTATING)
-            self.movement_obj.start_animation(self.direction.x, MOVEMENT_SPEED, PLAYER_SIZE[0], self.physics_rect.centerx, HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
+            self.movement_obj.start_animation(self.direction.x, MOVEMENT_SPEED, PLAYER_SIZE[0], self.rect.centerx, HorizontalState.MOVING_RIGHT if self.direction.x > 0 else HorizontalState.MOVING_LEFT)
 
         
         # אם זה זז באלחסון תנרמל את המהירות
@@ -67,10 +67,10 @@ class Player(pygame.sprite.Sprite):
             
     def collisions(self):
 
-        player_window_collisions(self.physics_rect)
+        player_window_collisions(self.rect)
 
         for platform in self.platforms:
-            if self.physics_rect.colliderect(platform.rect):
+            if self.rect.colliderect(platform.rect):
                 if self.direction.x != 0:
                     if PLAYER_STATE.horizontal == HorizontalState.MOVING_LEFT:
                         pass
@@ -79,7 +79,7 @@ class Player(pygame.sprite.Sprite):
                     elif PLAYER_STATE.horizontal == HorizontalState.MOVING_RIGHT:
                         pass
                          
-                self.physics_rect.bottom = platform.rect.top
+                self.rect.bottom = platform.rect.top
                 self.speedy = 0
                 self.gravity = GRAVITY
                 if not PLAYER_STATE.bounce==BounceState.BOUNCED:
@@ -95,7 +95,7 @@ class Player(pygame.sprite.Sprite):
             if not PLAYER_STATE.vertical==VerticalState.GROUNDED:
                 self.gravity += 400
             self.speedy += self.gravity * dt
-            self.physics_rect.y += self.speedy * dt
+            self.rect.y += self.speedy * dt
 
 
     def jump(self):
@@ -127,11 +127,11 @@ class Player(pygame.sprite.Sprite):
         if PLAYER_STATE.rotate == RotateState.ROTATING:
             self.rotation.lerp_value = self.rotation.update(dt, RotateState.IDLE)
             self.image = pygame.transform.rotate(self.original_surf, self.rotation.lerp_value)
-            self.physics_rect = self.image.get_rect(center=self.physics_rect.center)
+          
             
         if PLAYER_STATE.horizontal != HorizontalState.IDLE:
 
-            self.physics_rect.centerx = self.movement_obj.update(dt,HorizontalState.IDLE)
+            self.rect.centerx = self.movement_obj.update(dt,HorizontalState.IDLE)
 
         if PLAYER_STATE.shape == ShapeState.MORPH_TO_CIRCLE:
             self.border_radius = int(self.morph_circle.update(dt, ShapeState.IDLE_CIRCLE,easing=easeOutSine ))
@@ -143,10 +143,9 @@ class Player(pygame.sprite.Sprite):
 
         if PLAYER_STATE.shape == ShapeState.IDLE_CIRCLE:
                 self.image = draw_circle()
-                self.physics_rect = self.original_surf.get_rect(center=self.physics_rect.center)
 
     def sync_drawing_rect(self):
-        self.drawing_rect = self.image.get_rect(center = self.physics_rect.center)
+        self.drawing_rect = self.image.get_rect(center = self.rect.center)
 
     def update(self,dt):
         self.morph()
