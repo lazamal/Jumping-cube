@@ -5,7 +5,7 @@ from easings_functions import *
 
 
 class Animation():
-    def __init__(self, state_to_change, new_state_value):
+    def __init__(self, state_to_change):
         self.start: float = 0
         self.end: float = 0
         self.t: float = 0
@@ -13,11 +13,11 @@ class Animation():
         self.direction: int = 0
         self.last_direction: int = self.direction
         self.state_to_change: str = state_to_change
-        self.new_state_value : StrEnum = new_state_value
+        
 
 
-    def start_animation(self, direction, duration, target, current_position) -> None:
-        setattr(PLAYER_STATE, self.state_to_change, self.new_state_value)
+    def start_animation(self, direction, duration, target, current_position, new_state_value) -> None:
+        setattr(PLAYER_STATE, self.state_to_change, new_state_value)
         self.start = current_position
         self.end = self.start + target * direction
         if target == 0:
