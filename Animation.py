@@ -25,6 +25,10 @@ class Animation():
         self.t = 0
         self.duration = duration
 
+    def stop_animation(self, end_state):
+        self.t = 1
+        setattr(PLAYER_STATE, self.state_to_change, end_state)
+
 
     def update(self, dt, end_state : StrEnum, easing = linear):
         self.t += dt / self.duration

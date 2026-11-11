@@ -9,6 +9,7 @@ class Platform(pygame.sprite.Sprite):
         self.image = pygame.Surface((size))
         self.image.fill(PLATFORM_COLOR)
         self.rect = self.image.get_rect(midbottom = pos)
+        self.old_rect = pygame.Rect.copy(self.rect)
 
     def create_random_platforms( platforms_to_create, groups):
         platform_height = 200
@@ -27,3 +28,7 @@ class Platform(pygame.sprite.Sprite):
             width = max(1, platform_width+width_var)
 
             Platform((groups),(100*i+gap,WINDOW_HEIGHT),(width,height))
+
+    def update(self, dt):
+        self.old_rect = self.rect.copy()
+
