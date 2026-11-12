@@ -15,7 +15,6 @@ class Animation():
         self.state_to_change: str = state_to_change
         
 
-
     def start_animation(self, direction, duration, target, current_position, new_state_value) -> None:
         setattr(PLAYER_STATE, self.state_to_change, new_state_value)
         self.start = current_position
@@ -24,6 +23,10 @@ class Animation():
             self.end = 0
         self.t = 0
         self.duration = duration
+
+    def stop_animation(self, end_state):
+        self.t = 1
+        setattr(PLAYER_STATE, self.state_to_change, end_state)
 
 
     def update(self, dt, end_state : StrEnum, easing = linear):

@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.original_surf
         self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH/2,WINDOW_HEIGHT-PLATFORM_SIZE[1]))
         self.drawing_rect = pygame.Rect.copy(self.rect)
+        self.old_rect = pygame.Rect.copy(self.rect)
         
         # interactions
         
@@ -64,31 +65,46 @@ class Player(pygame.sprite.Sprite):
         # אם זה זז באלחסון תנרמל את המהירות
         if self.direction.length_squared() > 0:
             self.direction = self.direction.normalize()
-            
+
+    def bullet_time(self):
+         keys = pygame.key.get_pressed()
+         if keys[pygame.K_LCTRL]:
+              self.movement_obj.duration = MOVEMENT_SPEED*3
+              self.rotation.duration = MOVEMENT_SPEED*3
+
     def collisions(self):
 
         player_window_collisions(self.rect)
 
         for platform in self.platforms:
             if self.rect.colliderect(platform.rect):
-                if self.direction.x != 0:
+                
                     if PLAYER_STATE.horizontal == HorizontalState.MOVING_LEFT:
-                        pass
-                        # print("moving left")
-                        # if self.direction.x < 0: self.rect.left = platform.rect.right
+                        if self.rect.left <= platform.rect.right and self.old_rect.left >= platform.old_rect.right:
+                            self.rect.left = platform.rect.right
+                            self.movement_obj.stop_animation(HorizontalState.IDLE)
+                        
                     elif PLAYER_STATE.horizontal == HorizontalState.MOVING_RIGHT:
-                        pass
-                         
-                self.rect.bottom = platform.rect.top
-                self.speedy = 0
-                self.gravity = GRAVITY
-                if not PLAYER_STATE.bounce==BounceState.BOUNCED:
-                    self.bounce()
-                else:
-                    self.previous_vertical_state = PLAYER_STATE.vertical
-                    PLAYER_STATE.vertical = VerticalState.GROUNDED
-                    PLAYER_STATE.double_jump = DoubleJumpState.NO
-
+                        if self.rect.right >= platform.rect.left and self.old_rect.right <= platform.old_rect.left:
+                            self.rect.right = platform.rect.left
+                            self.movement_obj.stop_animation(HorizontalState.IDLE)
+             
+                    if self.speedy >= 0:
+                        if self.rect.bottom >= platform.rect.top and self.old_rect.bottom <= platform.old_rect.top:
+                            self.rect.bottom =platform.rect.top
+                            self.speedy = 0
+                            self.gravity = GRAVITY
+                            if not PLAYER_STATE.bounce==BounceState.BOUNCED:
+                                self.bounce()
+                            else:
+                                self.previous_vertical_state = PLAYER_STATE.vertical
+                                PLAYER_STATE.vertical = VerticalState.GROUNDED
+                                PLAYER_STATE.double_jump = DoubleJumpState.NO
+                    else:
+                        if self.rect.top <= platform.rect.bottom and self.old_rect.top >= platform.old_rect.bottom:
+                            self.rect.top =platform.rect.bottom
+                            self.speedy = 0
+   
 
     def apply_gravity(self,dt):
             
@@ -148,8 +164,10 @@ class Player(pygame.sprite.Sprite):
         self.drawing_rect = self.image.get_rect(center = self.rect.center)
 
     def update(self,dt):
+        self.old_rect = self.rect.copy()
         self.morph()
         self.movement()
+        self.bullet_time()
         self.double_jump()
         self.jump()
         self.apply_gravity(dt)
