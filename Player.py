@@ -65,7 +65,13 @@ class Player(pygame.sprite.Sprite):
         # אם זה זז באלחסון תנרמל את המהירות
         if self.direction.length_squared() > 0:
             self.direction = self.direction.normalize()
-            
+
+    def bullet_time(self):
+         keys = pygame.key.get_pressed()
+         if keys[pygame.K_LCTRL]:
+              self.movement_obj.duration = MOVEMENT_SPEED*3
+              self.rotation.duration = MOVEMENT_SPEED*3
+
     def collisions(self):
 
         player_window_collisions(self.rect)
@@ -98,10 +104,7 @@ class Player(pygame.sprite.Sprite):
                         if self.rect.top <= platform.rect.bottom and self.old_rect.top >= platform.old_rect.bottom:
                             self.rect.top =platform.rect.bottom
                             self.speedy = 0
-
-          
-          
-
+   
 
     def apply_gravity(self,dt):
             
@@ -164,6 +167,7 @@ class Player(pygame.sprite.Sprite):
         self.old_rect = self.rect.copy()
         self.morph()
         self.movement()
+        self.bullet_time()
         self.double_jump()
         self.jump()
         self.apply_gravity(dt)

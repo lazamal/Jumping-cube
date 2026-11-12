@@ -15,7 +15,6 @@ class Animation():
         self.state_to_change: str = state_to_change
         
 
-
     def start_animation(self, direction, duration, target, current_position, new_state_value) -> None:
         setattr(PLAYER_STATE, self.state_to_change, new_state_value)
         self.start = current_position
